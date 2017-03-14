@@ -13,7 +13,7 @@ class IsingTrivial():
         self.n = n
         self.d = d
 
-        self.all_points = range(1, n**d+1)
+        self.all_points = range(1, n**d + 1)
         self.all_clauses = []
 
         # For each point
@@ -22,26 +22,28 @@ class IsingTrivial():
             i = k * n
             line = self.all_points[i:i + n]
             for j in range(len(line)):
-                self.add_clause(line[j], line[(j + 1) % len(line)], self.map_edge_coord_to_number(j,k,False))
-                #print line[j]
-                #print line[(j + 1) % len(line)]
-                #print self.map_edge_coord_to_number(j,k,False)
-                #print "\n"
+                self.add_clause(line[j], line[(j + 1) % len(line)],
+                                self.map_edge_coord_to_number(j, k, False))
+                # print line[j]
+                # print line[(j + 1) % len(line)]
+                # print self.map_edge_coord_to_number(j,k,False)
+                # print "\n"
         # For each column
         for k in range(0, n):
             line = self.all_points[k:n**d:n]
             for j in range(len(line)):
-                self.add_clause(line[j], line[(j + 1) % len(line)], self.map_edge_coord_to_number(k,(line[j]-k)/self.n,True))
-                #print line[j]
-                #print line[(j + 1) % len(line)]
-                #print self.map_edge_coord_to_number(k,(line[j]-k)/self.n,True)
-                #print "\n"
+                self.add_clause(line[j], line[
+                                (j + 1) % len(line)], self.map_edge_coord_to_number(k, (line[j] - k) / self.n, True))
+                # print line[j]
+                # print line[(j + 1) % len(line)]
+                # print self.map_edge_coord_to_number(k,(line[j]-k)/self.n,True)
+                # print "\n"
 
     def add_clause(self, a, b, c):
         self.all_clauses += xnor_to_cnf_edge(a, b, c)
 
     def add_clause_end(self):
-        for a in range(17,49):
+        for a in range(17, 49):
             self.all_clauses += [[a]]
 
     def map_point_coord_to_number(self, x, y):
@@ -65,14 +67,13 @@ class IsingTrivial():
 
     def itersolve(self):
         return pycosat.itersolve(self.all_clauses)
-    
+
 ising = IsingTrivial()
 ising.add_clause_end()
 # print ising.map_edge_coord_to_number(1, 5, True)
 
 
 for i in list(ising.itersolve()):
-   print i
+    print i
 
-#ising.printout_clauses()
-
+# ising.printout_clauses()
