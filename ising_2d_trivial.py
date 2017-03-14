@@ -1,6 +1,6 @@
 import pycosat
 
-from utils import xnor_to_cnf_edge, xor_to_cnf_edge
+from to_cnf import *
 
 
 class IsingTrivial():
@@ -8,55 +8,89 @@ class IsingTrivial():
     """
 
     def __init__(self):
-        n = 4
+        n = 2
         d = 2
+        k = 2
         self.n = n
         self.d = d
+        self.k = k
 
         self.all_points = range(1, n**d + 1)
+        self.all_edges = range(n**d + 1, 3 * (n**d) + 1)
         self.all_clauses = []
 
-        # For each point
-        # For each row
-        for k in range(0, n):
-            i = k * n
-            line = self.all_points[i:i + n]
-            for j in range(len(line)):
-                self.add_clause(line[j], line[(j + 1) % len(line)],
-                                self.map_edge_coord_to_number(j, k, False))
-                # print line[j]
-                # print line[(j + 1) % len(line)]
-                # print self.map_edge_coord_to_number(j,k,False)
-                # print "\n"
-        # For each column
-        for k in range(0, n):
-            line = self.all_points[k:n**d:n]
-            for j in range(len(line)):
-                self.add_clause(line[j], line[
-                                (j + 1) % len(line)], self.map_edge_coord_to_number(k, (line[j] - k) / self.n, True))
-                # print line[j]
-                # print line[(j + 1) % len(line)]
-                # print self.map_edge_coord_to_number(k,(line[j]-k)/self.n,True)
-                # print "\n"
+        self.add_edges_clauses()
+        # self.set_all_edges_true()
+        self.add_counter_clasues()
 
     def add_clause(self, a, b, c):
         self.all_clauses += xnor_to_cnf_edge(a, b, c)
 
-    def add_clause_end(self):
-        for a in range(17, 49):
-            self.all_clauses += [[a]]
+    def add_edges_clauses(self):
+        n = self.n
+        # For each point
+        for a in range(n):
+            for b in range(n):
+                self.add_clause(self.map_point_coord(a, b), self.map_point_coord((a + 1) % n, b),
+                                self.map_edge_coord(a, b, False))
+                self.add_clause(self.map_point_coord(a, b), self.map_point_coord(a, (b + 1) % n),
+                                self.map_edge_coord(a, b, True))
 
-    def map_point_coord_to_number(self, x, y):
+    '''def set_all_edges_true(self):
+        for edge in self.all_edges:
+            self.all_clauses += [[edge]]'''
+
+    def add_counter_clasues(self):
+        # 1
+        # For each edge
+        for i in range(self.n**self.d + 1, 3 * self.n**self.d + 1):
+            # i - absolute edge number
+            self.all_clauses += one_to_cnf(i,
+                                           self.map_register(i - self.n**self.d, 1))
+
+        # 2
+        for j in range(2, self.k + 1):
+            self.all_clauses += two_to_cnf(self.map_register(1, j))
+
+        # 3
+        for i in range(2, 2 * self.n**self.d):
+            for j in range(1, self.k + 1):
+                self.all_clauses += three_to_cnf(
+                    self.map_register(i - 1, j), self.map_register(i, j))
+
+        # 4
+        for i in range(2,  2 * self.n**self.d):
+            for j in range(2, self.k + 1):
+                edge_i = i + self.n**self.d
+                self.all_clauses += four_to_cnf(edge_i,
+                                                self.map_register(i - 1, j - 1), self.map_register(i, j))
+
+        # 5
+        for i in range(1,  2 * self.n**self.d + 1):
+            edge_i = i + self.n**self.d
+            self.all_clauses += five_to_cnf(edge_i,
+                                            self.map_register(i - 1, self.k))
+
+    # Mappers
+    def map_point_coord(self, x, y):
         """ y - rzad
             x - columna
         """
-        return self.n * y + x
+        return self.n * y + x + 1
 
-    def map_edge_coord_to_number(self, x, y, dir):
+    def map_edge_coord(self, x, y, dir):
         """ y - rzad
             x - columna
         """
         return self.n * y + x + (dir + 1) * (len(self.all_points)) + 1
+
+    def map_register(self, i, j):
+        return 3 * self.n**self.d + (j - 1) * self.n + i + 1
+
+    # for debugging pupuses
+
+    def set_k(self, k):
+        self.k = k
 
     def printout_clauses(self):
         for clause in self.all_clauses:
@@ -68,12 +102,18 @@ class IsingTrivial():
     def itersolve(self):
         return pycosat.itersolve(self.all_clauses)
 
-ising = IsingTrivial()
-ising.add_clause_end()
-# print ising.map_edge_coord_to_number(1, 5, True)
 
+ising = IsingTrivial()
+ising.printout_clauses()
+
+# ising.add_clause_end()
+# print ising.map_edge_coord(1, 5, True)
+
+print '\n'
 
 for i in list(ising.itersolve()):
     print i
 
-# ising.printout_clauses()
+print len(list(ising.itersolve()))
+
+# print ising.all_edges
