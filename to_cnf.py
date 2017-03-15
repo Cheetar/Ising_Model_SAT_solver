@@ -35,4 +35,4 @@ def four_to_cnf(x, r1, r2):
 
 
 def five_to_cnf(x, r):
-    return [[-x, r]]
+    return [[-x, -r]]

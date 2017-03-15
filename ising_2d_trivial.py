@@ -10,7 +10,7 @@ class IsingTrivial():
     def __init__(self):
         n = 2
         d = 2
-        k = 3
+        k = 1
         self.n = n
         self.d = d
         self.k = k
@@ -58,8 +58,6 @@ class IsingTrivial():
                 self.all_clauses += three_to_cnf(
                     self.map_register(i - 1, j), self.map_register(i, j))
 
-        # chwilowo dotad zdebugowane
-
         # 4
         for i in range(2,  2 * self.n**self.d):
             for j in range(2, self.k + 1):
@@ -68,7 +66,7 @@ class IsingTrivial():
                                                 self.map_register(i - 1, j - 1), self.map_register(i, j))
 
         # 5
-        for i in range(1,  2 * self.n**self.d + 1):
+        for i in range(2,  2 * self.n**self.d + 1):
             edge_i = i + self.n**self.d
             self.all_clauses += five_to_cnf(edge_i,
                                             self.map_register(i - 1, self.k))
@@ -87,7 +85,7 @@ class IsingTrivial():
         return self.n * y + x + (dir + 1) * (len(self.all_points)) + 1
 
     def map_register(self, i, j):
-        return 3 * self.n**self.d + (j - 1) * 2 * self.n ** self.d + i
+        return 3 * self.n**self.d + (i - 1) * (self.k) + j
 
     # for debugging pupuses
 
@@ -113,9 +111,9 @@ ising.printout_clauses()
 
 print '\n'
 
-# for i in list(ising.itersolve()):
-# print i
+for i in list(ising.itersolve()):
+    print i
 
-# print len(list(ising.itersolve()))
+print len(list(ising.itersolve()))
 
 # print ising.all_edges
