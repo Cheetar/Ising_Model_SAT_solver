@@ -18,13 +18,13 @@ def numer_krawedzi(i, j):
 # n-liczba punktow w boku siatki
 # d-wymiar siatki (ale na razie brak klauzul na sasiedztwo w innych
 # wymiarach, wiec d=const=2)
-n = 2
+n = 7
 d = 2
 
 # k-licznik stanu energetycznego
 # l-liczba krawedzi - polaczen miedzy sasiadami
 l = 2 * n**d
-k = 1  # nawet jakby sie chialo to nie mozna zero
+k = 49  # nawet jakby sie chialo to nie mozna zero
 
 # zakresy na iksy-krawedzie,rejestry-rejestry, punkty-punkty
 iksy = range(1, l + 1)
@@ -81,9 +81,19 @@ for j in range(1, n + 1):
 
 # wypisywanie:
 
-for i in list(pycosat.itersolve(klauzule)):
-    print i
+# for i in list(pycosat.itersolve(klauzule)):
+#    print i
 
 # liczba rozwiazan:
 
-print len(list(pycosat.itersolve(klauzule)))
+# print len(list(pycosat.itersolve(klauzule)))
+
+
+def klauzle_to_txt(klauzule, path):
+    with open(path, "w") as out:
+        for klauzula in klauzule:
+            for num in klauzula:
+                out.write(str(num) + " ")
+            out.write("0\n")
+
+klauzle_to_txt(klauzule, "input.txt")
