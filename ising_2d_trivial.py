@@ -87,7 +87,7 @@ class IsingTrivial():
     def map_register(self, i, j):
         return 3 * self.n**self.d + (i - 1) * (self.k) + j
 
-    # for debugging pupuses
+    # for debugging purpuses
 
     def set_k(self, k):
         self.k = k
